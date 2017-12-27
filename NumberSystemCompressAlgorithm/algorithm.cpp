@@ -1,7 +1,8 @@
 #ifndef __LangCompressAlgorithm__cpp__
 #define __LangCompressAlgorithm__cpp__
 
-void ly::compresser::encompress(package_t &in){
+namespace ly{
+void compresser::encompress(package_t &in){
 	threads_t threads;
 	step_locker locker;
 	data_t sum_all;
@@ -68,7 +69,7 @@ void ly::compresser::encompress(package_t &in){
 	in.size=i;
 }
 
-void ly::compresser::decompress(package_t &in){
+void compresser::decompress(package_t &in){
 	threads_t threads;
 	step_lock locker;
 	data_t sum_all;
@@ -131,7 +132,7 @@ void ly::compresser::decompress(package_t &in){
 	in.size=i;
 }
 
-compresser &ly::compresser::encompress(){
+compresser &compresser::encompress(){
 	threads_t threads;
 	step_lock locker;
 	static void_func encompresser=[&](){
@@ -149,7 +150,7 @@ compresser &ly::compresser::encompress(){
 	return *this;
 }
 
-compresser &ly::compresser::decompress(){
+compresser &compresser::decompress(){
 	threads_t threads;
 	step_lock locker;
 	static void_func decompresser=[&](){
@@ -167,7 +168,7 @@ compresser &ly::compresser::decompress(){
 	return *this;
 }
 
-std::istream &ly::compresser::operator>>(std::istream &is,compresser &n){
+std::istream &compresser::operator>>(std::istream &is,compresser &n){
 	while(!is.eof()){
 		n.p.push_back();
 		n.p.back().size=input_size;
@@ -184,7 +185,7 @@ std::istream &ly::compresser::operator>>(std::istream &is,compresser &n){
 	return is;
 }
 
-std::ostream &ly::compresser::operator<<(std::ostream &os,compresser &n)noexcept{
+std::ostream &compresser::operator<<(std::ostream &os,compresser &n)noexcept{
 	for(auto i=n.p.begin();i!=n.p.end();++i){
 		if(is_encompress) os<<(*i).loop;
 		for(op_t j=0;j<output_size;++j){
@@ -192,5 +193,6 @@ std::ostream &ly::compresser::operator<<(std::ostream &os,compresser &n)noexcept
 		}
 	}
 	return os;
+}
 }
 #endif
