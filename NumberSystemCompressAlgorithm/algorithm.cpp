@@ -1,67 +1,196 @@
-#include <array>
-#include <function>
-#include <thread>
-#include <mutex>
-#include <utility>
-#include <random>
-#include <ctime>
-#include <vector>
-#include <iostream>
-#include <stdexcept>
+#ifndef __LangCompressAlgorithm__cpp__
+#define __LangCompressAlgorithm__cpp__
 
-#ifndef __LangCompressAlgorithm__h__
-#define __LangCompressAlgorithm__h__
-
-namespace ly{
-	typedef unsigned char byte;
-	typedef long op_t;
-	constexpr auto length=256;
-	constexpr auto system=128;
-	constexpr auto byte_size=sizeof(byte)*8;
-	constexpr auto flag_size=length/byte_size;
-	constexpr auto max_byte=256;
-	constexpr auto max_loop=max_byte-2;
-	typedef std::array<byte,length> data_t;
-	typedef std::array<byte,flag_size> flag_t;
-	struct package_t{
-		data_t data;
-		flag_t flag;
-		op_t size;
-		byte loop=0;
-	};
-	typedef std::vector<std::thread> threads_t;
-	typedef std::function<void()> void_func;
-	typedef std::vector<package_t> packages_t;
-	struct step_lock{
-		op_t step=0;
-		std::mutex lock;
-		op_t get(bool opposition=false){
-			op_t m;
-			lock.lock();
-			m=step++;
-			lock.unlock();
-			return m;
+void ly::compresser::encompress(package_t &in){
+	threads_t threads;
+	step_locker locker;
+	data_t sum_all;
+	std::mutex data_locker;
+	
+	static void_func strainer=[&](){
+		op_t s,i,j;
+		for(;;){
+			s=locker.get();
+			if(s>=flag_size) break;
+			for(i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
+				if(in.data[i]>=system){
+					in.data[i]-=system;
+					in.flag[j]|=1<<j;
+				}
+			}
 		}
 	};
-	struct compresser{
-		friend std::istream &operator>>(std::istream &is,compresser &n);
-		friend std::ostream &operator<<(std::istream &os,compresser &n);
-		
-		packages_t p;
-		op_t input_size,output_size;
-		op_t core_thread_count=1,strain_thread_count=1,package_thread_count=std::thread::hardware_concurrency();
-		bool is_encompress=true;
-		
-		compresser &encompress();
-		compresser &decompress();
-	private:
-		void encompress(package_t &in);
-		void decompress(package_t &in);
-		
-	public:
-		compresser(bool will_encompress=true,op_t form=length,op_t to=length/2){}
+	for(op_t i=0;i<core_thread_count;++i) threads.emplace_back(strainer);
+	for(auto &i:threads) i.join();
+	
+	threads.empty();
+	
+	locker.step=0;
+	static void_func translater=[&](){
+		data_t sum;
+		op_t s,t,i,j;
+		for(;;){
+			s=locker.get();
+			if(s>=length) break;
+			if(in[s]==0) continue;
+			t=in[s]*system;
+			i=s;
+			do{
+				t+=sum[i];
+				sum[i]=static_cast<byte>(t);
+				t>>=byte_size;
+				++i;
+			}while(t!=0);
+			if(s>j) j=s;
+		}
+		t=0;
+		data_locker.lock();
+		do{
+			t+=sum_all[i]+sum[i];
+			sum_all[i]=static_cast<byte>(t);
+			t>>=byte_size;
+			++i;
+		}while(t!=0||i<j);
+		data_locker.unlock();
 	};
-	data_t &random_data(bool use_time_seed=false);
+	for(op_t i=0;i<strain_thread_count;++i) threads.emplace_back(translater);
+	for(auto &i:threads) i.join();
+	in.data=sum_all;
+	
+	++in.loop;
+	if(in.loop>=max_loop) throw std::runtime_error("Too large loops");
+	
+	op_t i=in.size;
+	for(;i>=0&&in.data[i]==0;--i);
+	++i;
+	for(op_t j=0;j<flag_size;in.data[j++]=in.flag[i++]);
+	for(;i>=0&&in.data[i]==0;--i);
+	in.size=i;
 }
 
+void ly::compresser::decompress(package_t &in){
+	threads_t threads;
+	step_lock locker;
+	data_t sum_all;
+	std::mutex data_locker;
+	
+	op_t i=in.size-flag_size;
+	for(op_t j=0;j<flag_size;++i,++j){
+		in.flag[j]=in.data[i];
+		in.data[i]=0;
+	}
+	
+	locker.size=i;
+	static void_func translater=[&](){
+		data_t sum;
+		op_t s,t=0,i;
+		for(;;){
+			s=locker.get(true);
+			if(s<0) break;
+			i=s;
+			do{
+				t<<=byte_size;
+				t+=in.data[i]+sum[i];
+				sum[i]=static_cast<byte>(t/system);
+				t%=system;
+				--i;
+			}while(t!=0);
+		}
+		t=0;
+		data_locker.lock();
+		do{
+			t+=sum_all[i]+sum[i];
+			sum_all[i]=static_cast<byte>(t);
+			t>>=byte_size;
+			++i;
+		}while(t<s||t!=0);
+		data_locker.unlock();
+	};
+	for(op_t i=0;i<core_thread_count;++i) threads.emplace_back(translater);
+	for(auto &i:threads) i.join();
+	in.data=sum_all;
+	
+	threads.empty();
+	
+	locker.step=0;
+	static void_func strainer=[&](){
+		op_t s,i,j;
+		for(;;){
+			s=locker.get();
+			if(s>=flag_size) break;
+			for(i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
+				if(in.flag[s]&(1<<j)!=0) in.data[i]+=system;
+			}
+		}
+	};
+	for(op_t i=0;i<strain_thread_count;++i) threads.emplace_back(strainer);
+	for(auto &i:threads) i.join();
+	
+	--in.loop;
+	for(i=length-1;i>=0&&in.data[i]==0;--i);
+	in.size=i;
+}
+
+compresser &ly::compresser::encompress(){
+	threads_t threads;
+	step_lock locker;
+	static void_func encompresser=[&](){
+		op_t s;
+		for(;;){
+			s=locker.get();
+			if(s>=p.size()) break;
+			do{
+				encompress(p[s]);
+			}while(p[s].size>output_size);
+		}
+	};
+	for(op_t i=0;i<package_thread_count;++i) threads.emplace_back(encompresser);
+	for(auto &i:threads) i.join();
+	return *this;
+}
+
+compresser &ly::compresser::decompress(){
+	threads_t threads;
+	step_lock locker;
+	static void_func decompresser=[&](){
+		op_t s;
+		for(;;){
+			s=locker.get();
+			if(s>=p.size()) break;
+			do{
+				decompress(p[s]);
+			}while(p[s].loop>0);
+		}
+	};
+	for(op_t i=0;i<package_thread_count;++i) threads.emplace_back(decompresser);
+	for(auto &i:threads) i.join();
+	return *this;
+}
+
+std::istream &ly::compresser::operator>>(std::istream &is,compresser &n){
+	while(!is.eof()){
+		n.p.push_back();
+		n.p.back().size=input_size;
+		if(!is_encompress){
+			if(!is>>n.p.back().loop) throw std::runtime_error("Readed failed");
+		}
+		for(op_t i=0;i<input_size;++i){
+			if(!is>>n.p.back().data[i]){
+				if(is.fail()) throw std:runtime_error("Readed failed");
+				break;
+			}
+		}
+	}
+	return is;
+}
+
+std::ostream &ly::compresser::operator<<(std::ostream &os,compresser &n)noexcept{
+	for(auto i=n.p.begin();i!=n.p.end();++i){
+		if(is_encompress) os<<(*i).loop;
+		for(op_t j=0;j<output_size;++j){
+			os<<(*i)[j];
+		}
+	}
+	return os;
+}
 #endif
