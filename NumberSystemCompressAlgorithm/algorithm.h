@@ -32,21 +32,7 @@ namespace ly{
 	typedef std::vector<std::thread> threads_t;
 	typedef std::function<void()> void_func;
 	typedef std::vector<package_t> packages_t;
-	struct step_lock{
-		op_t step=0;
-		std::mutex lock;
-		inline op_t get(bool opposition=false){
-			op_t m;
-			lock.lock();
-			if(opposition){
-				m=step--;
-			}else{
-				m=step++;
-			}
-			lock.unlock();
-			return m;
-		}
-	};
+	typedef std::lock_guard<std::mutex> locker;
 	struct compresser{
 		friend std::istream &operator>>(std::istream &is,compresser &n);
 		friend std::ostream &operator<<(std::istream &os,compresser &n)noexcept;
