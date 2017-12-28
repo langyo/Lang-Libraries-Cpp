@@ -29,7 +29,7 @@ namespace ly{
 			for(;;){
 				{
 					// 获取任务号。
-					locker l(step_lock);
+					locker l(step_locker);
 					s=step++;
 				}
 				if(s>=flag_size) break;
@@ -57,7 +57,7 @@ namespace ly{
 			op_t s,t,i,j;
 			for(;;){
 				{
-					locker l(step_lock);
+					locker l(step_locker);
 					s=step++;
 				}
 				if(s>=length) break;
@@ -77,7 +77,7 @@ namespace ly{
 			t=0;
 			{
 				// 将此线程的累加结果加至总结果。
-				locker l(data_lock);
+				locker l(data_locker);
 				do{
 					t+=sum_all[i]+sum[i];
 					sum_all[i]=static_cast<byte>(t);
@@ -110,7 +110,7 @@ namespace ly{
 		threads_t threads;
 		op_t step;
 		data_t sum_all;
-		std::mutex data_locker,step_lock;
+		std::mutex data_locker,step_locker;
 	
 		// ——第一部分：取标志位——
 		op_t i=in.size-flag_size;
@@ -126,7 +126,7 @@ namespace ly{
 			op_t s,t=0,i;
 			for(;;){
 				{
-					locker l(step_lock);
+					locker l(step_locker);
 					s=step--;
 				}
 				if(s<0) break;
@@ -143,7 +143,7 @@ namespace ly{
 			// 将此线程的累加结果加至总结果。
 			t=0;
 			{
-				locker l(data_lock);
+				locker l(data_locker);
 				do{
 					t+=sum_all[i]+sum[i];
 					sum_all[i]=static_cast<byte>(t);
@@ -167,7 +167,7 @@ namespace ly{
 			op_t s,i,j;
 			for(;;){
 				{
-					locker l(step_lock);
+					locker l(step_locker);
 					s=step++;
 				}
 				if(s>=flag_size) break;
