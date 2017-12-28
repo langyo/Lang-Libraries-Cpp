@@ -69,9 +69,9 @@ namespace ly{
 				}
 				if(s>=length) break;
 				// 如果乘数为零就不用算了，直接过。
-				if(in[s]==0) continue;
+				if(in.data[s]==0) continue;
 				// 乘法+进位加法。
-				t=in[s]*system;
+				t=in.data[s]*system;
 				i=s;
 				do{
 					t+=sum[i];
