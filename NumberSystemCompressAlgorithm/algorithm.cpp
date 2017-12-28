@@ -1,13 +1,6 @@
 #ifndef __LangCompressAlgorithm__cpp__
 #define __LangCompressAlgorithm__cpp__
 
-/*
-	警告：该算法仍有bug未修复，请暂时不要使用。
-	
-	记录：
-	稍后将flag从后面移动到前面，以防止出现空字节干扰size变量的正常解析。
-*/
-
 namespace ly{
 	/*
 		对于涉及多线程的函数的变量统一命名：
@@ -96,8 +89,6 @@ namespace ly{
 		// 分配线程。
 		for(op_t i=0;i<strain_thread_count;++i) threads.emplace_back(translater);
 		for(auto &i:threads) i.join();
-		// 存入结果。
-		in.data=std::move(sum_all);
 		
 		// ——第三部分：刷新数据——
 		// loop变量部分。
@@ -106,11 +97,15 @@ namespace ly{
 		
 		// size变量部分。
 		op_t i=in.size;
-		// 压缩后数据末尾有多少零，就砍掉几个字节。
-		for(;i>=0&&in.data[i]==0;--i);
-		// 后面跟上固定的flag_size长度，并将此次flag_size写入。
-		in.size=flag_size+(i++);
-		for(op_t j=0;j<flag_size;in.data[j++]=in.flag[i++]);
+		// 压缩后的数据末尾有多少零，就砍掉几个字节。
+		for(;i>=0&&sum_all[i]==0;--i);
+		in.size=i+flag_size;
+		// 首先写入固定的flag_size。
+		for(op_t j=0;j<flag_size;++j) in.data[j]=in.flag[j];
+		// 然后将sum_all填入；别问我为什么不用std::copy。
+		for(op_t j=flag_size,k=0;k<i;++j,++k) in.data[k]=std::move(sum_all[j]);
+		// 将末尾部分补零；如果实在想更快些可以不要这段，但不保证会不会出现数据错误。
+		for(op_t j=i+flag_size;j<length;++j) in.data[j]=0;
 	}
 
 	void compresser::decompress(package_t &in){
@@ -120,10 +115,9 @@ namespace ly{
 		std::mutex data_locker,step_locker;
 	
 		// ——第一部分：取标志位——
-		op_t i=in.size-flag_size;
-		for(op_t j=0;j<flag_size;++i,++j){
-			in.flag[j]=in.data[i];
-			in.data[i]=0;
+		op_t i=0;
+		for(;i<flag_size;++i){
+			in.flag[i]=in.data[i];
 		}
 		
 		// ——第二部分：进制转换——
@@ -136,7 +130,7 @@ namespace ly{
 					locker l(step_locker);
 					s=step--;
 				}
-				if(s<0) break;
+				if(s<flag_size) break;
 				// 这里的并行除法算法是根据每一数位的除数与余数关系而写的。
 				i=s;
 				do{
@@ -145,7 +139,7 @@ namespace ly{
 					sum[i]=static_cast<byte>(t/system);
 					t%=system;
 					--i;
-				}while(t!=0);
+				}while(t!=0&&i>=flag_size);
 			}
 			// 将此线程的累加结果加至总结果。
 			t=0;
@@ -165,11 +159,11 @@ namespace ly{
 		// 存入结果。
 		in.data=std::move(sum_all);
 		
-		//清空线程。
+		// 清空线程。
 		threads.empty();
 		
 		// ——第三部分：数据还原——
-		locker.step=0;
+		step=0;
 		static void_func strainer=[&](){
 			op_t s,i,j;
 			for(;;){
@@ -191,7 +185,7 @@ namespace ly{
 		// ——第四部分：刷新数据——
 		// loop变量部分。
 		--in.loop;
-		//// size变量部分，需要检验有效性。
+		// size变量部分。
 		for(i=length-1;i>=0&&in.data[i]==0;--i);
 		in.size=i;
 	}
