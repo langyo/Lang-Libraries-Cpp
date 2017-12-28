@@ -70,10 +70,8 @@ namespace ly{
 		
 		op_t i=in.size;
 		for(;i>=0&&in.data[i]==0;--i);
-		++i;
+		in.size=flag_size+(i++);
 		for(op_t j=0;j<flag_size;in.data[j++]=in.flag[i++]);
-		for(;i>=0&&in.data[i]==0;--i);
-		in.size=i;
 	}
 
 	void compresser::decompress(package_t &in){
@@ -215,6 +213,15 @@ namespace ly{
 			}
 		}
 		return os;
+	}
+	
+	data_t &random_data(bool use_time_seed=false){
+		static std::default_random_engine e;
+		static std::uniform_int_disribution<byte> u(0,256);
+		if(use_time_seed) e.seed(std::time(0));
+		data_t ret;
+		for(auto &i:ret) i=u(e);
+		return std::move(ret);
 	}
 }
 #endif
