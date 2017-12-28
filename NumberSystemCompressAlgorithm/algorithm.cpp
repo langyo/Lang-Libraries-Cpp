@@ -1,6 +1,13 @@
 #ifndef __LangCompressAlgorithm__cpp__
 #define __LangCompressAlgorithm__cpp__
 
+/*
+	警告：该算法仍有bug未修复，请暂时不要使用。
+	
+	记录：
+	稍后将flag从后面移动到前面，以防止出现空字节干扰size变量的正常解析。
+*/
+
 namespace ly{
 	/*
 		对于涉及多线程的函数的变量统一命名：
