@@ -82,5 +82,5 @@ namespace ly{
 	data_t &random_data(bool use_time_seed=false);
 	// 测试用代码，用于生成一串随机数据以测试压缩；调试状态下，请保持参数为false；如果想测试大批量测试压缩性能，请开true以生成不同的数据。
 }
-
+#include "algorithm.cpp"
 #endif
