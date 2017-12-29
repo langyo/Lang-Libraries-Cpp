@@ -13,17 +13,17 @@ typedef unsigned char byte;
 typedef long op_t;
 // 在算法中参与运算的整数类型；如果要移植到低配置、低要求的机器上，可以将此类型改改。
 	
-constexpr auto length=256;
+const op_t length=256;
 // 单批处理数据的长度；暂时不能更改。
-constexpr auto system=128;
+const op_t system=128;
 // 欲使用的进制；暂时不能更改。
-constexpr auto byte_size=sizeof(byte)*8;
+const op_t byte_size=8;
 // 一个字节有多少位，主要用于进行移位运算；不能更改。
-constexpr auto flag_size=length/byte_size;
+const op_t flag_size=length/byte_size;
 // 标志位长度，用于记录欲压缩的字节是否超出system；暂时不能更改。
-constexpr auto max_byte=256;
+const op_t max_byte=256;
 // 一个字节能够表示多少种数字；不能更改。
-constexpr auto max_loop=max_byte-2;
+const op_t max_loop=max_byte-2;
 // 一个字节最多能够容纳多少次循环；不能更改。
 	
 typedef std::array<byte,length> data_t;
