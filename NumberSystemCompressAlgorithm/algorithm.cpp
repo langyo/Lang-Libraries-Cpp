@@ -47,7 +47,7 @@ namespace ly{
 		for(auto &i:threads) i.join();
 		
 		// 清空线程。
-		threads.empty();
+		threads.clear();
 		
 		// ——第二部分：进制转换——
 		// 将源数据的进制当作128进制，再向256进制转换。
@@ -160,7 +160,7 @@ namespace ly{
 		in.data=std::move(sum_all);
 		
 		// 清空线程。
-		threads.empty();
+		threads.clear();
 		
 		// ——第三部分：数据还原——
 		step=0;
@@ -236,7 +236,7 @@ namespace ly{
 		return *this;
 	}
 	
-	template<> std::istream &std::istream::operator>>(compresser &n){
+	std::istream &operator>>(compresser &n){
 		auto &is=*this;
 		// 输入流重载。
 		while(!is.eof()){
@@ -256,7 +256,7 @@ namespace ly{
 		return is;
 	}
 	
-	template<> std::ostream &std::ostream::operator<<(compresser &n)noexcept{
+	std::ostream &operator<<(compresser &n)noexcept{
 		auto &os=*this;
 		// 输出流重载。
 		for(auto &i:n.p){
