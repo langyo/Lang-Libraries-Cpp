@@ -5,7 +5,7 @@ int main(){
 	cout<<"输入部分长度为256"<<endl;
 	compresser c;
 	c.p.emplace_back();
-	c.p.front().data=random_data();
+	for(auto &i:c.p.front().data) i=0xFF;
 	try{
 		c.encompress();
 		cout<<"输出部分长度为"<<c.p.front().size<<endl;
