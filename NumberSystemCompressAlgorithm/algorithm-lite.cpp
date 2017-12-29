@@ -1,3 +1,7 @@
+#ifndef __LangCompressAlgorithm__lite__cpp__
+#define __LangCompressAlgorithm__lite__cpp__
+
+	
 	void compresser::encompress(package_t &in){	
 		// ——第一部分：净化数据——
 		// 使得源输入数据符合压缩要求，能够进行压缩。
@@ -86,3 +90,15 @@
 		for(op_t i=length-1;i>=0&&in.data[i]==0;--i);
 		in.size=i;
 	}
+	
+	data_t &random_data(bool use_time_seed=false){
+		// 生成随机的测试数据，仅用于调试。
+		static std::default_random_engine e;
+		static std::uniform_int_disribution<byte> u(0,256);
+		if(use_time_seed) e.seed(std::time(0));
+		data_t ret;
+		for(auto &i:ret) i=u(e);
+		return std::move(ret);
+	}
+	
+	#endif
