@@ -47,3 +47,42 @@
 		for(op_t j=i+flag_size;j<length;++j) in.data[j]=0;
 	}
 
+	void compresser::decompress(package_t &in){
+		// ——第一部分：取标志位——
+		op_t i=0;
+		for(;i<flag_size;++i){
+			in.flag[i]=in.data[i];
+		}
+		
+		// ——第二部分：进制转换——
+		data_t sum;
+		op_t s,t=0;
+		for(op_t s=i,t=0,ii=0;s>=flag_size;--s){
+			// 这里的并行除法算法是根据每一数位的除数与余数关系而写的。
+			ii=s;
+			do{
+				t<<=byte_size;
+				t+=in.data[ii]+sum[ii];
+				sum[ii]=static_cast<byte>(t/system);
+				t%=system;
+				--ii;
+			}while(t!=0&&ii>=flag_size);
+		}
+		// 存入结果。
+		in.data=std::move(sum);
+		
+		// ——第三部分：数据还原——
+		for(op_t s=0;s<flag_size;++s){
+			// 根据原本flag_size里记录的结果来还原数据。
+			for(op_t i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
+				if(in.flag[s]&(1<<j)!=0) in.data[i]+=system;
+			}
+		}
+		
+		// ——第四部分：刷新数据——
+		// loop变量部分。
+		--in.loop;
+		// size变量部分。
+		for(op_t i=length-1;i>=0&&in.data[i]==0;--i);
+		in.size=i;
+	}
