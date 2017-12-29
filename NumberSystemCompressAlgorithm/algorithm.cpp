@@ -236,19 +236,18 @@ namespace ly{
 		return *this;
 	}
 	
-	std::istream &operator>>(compresser &n){
-		auto &is=*this;
+	std::istream &operator>>(std::istream &is,compresser &n){
 		// 输入流重载。
 		while(!is.eof()){
-			n.p.push_back();
-			n.p.back().size=input_size;
-			if(!is_encompress){
+			n.p.emplace_back();
+			n.p.back().size=n.input_size;
+			if(!n.is_encompress){
 				// 如果是解压的话，先读头部存储的已压缩次数。
 				if(!is>>n.p.back().loop) throw std::runtime_error("Readed failed");
 			}
-			for(op_t i=0;i<input_size;++i){
+			for(op_t i=0;i<n.input_size;++i){
 				if(!is>>n.p.back().data[i]){
-					if(is.fail()) throw std:runtime_error("Readed failed");
+					if(is.fail()) throw std::runtime_error("Readed failed");
 					break;
 				}
 			}
@@ -256,14 +255,13 @@ namespace ly{
 		return is;
 	}
 	
-	std::ostream &operator<<(compresser &n)noexcept{
-		auto &os=*this;
+	std::ostream &operator<<(std::ostream &os,compresser &n)noexcept{
 		// 输出流重载。
 		for(auto &i:n.p){
 			// 如果为压缩后数据，先写入循环次数头。
-			if(is_encompress) os<<i.loop;
-			for(op_t j=0;j<output_size;++j){
-				os<<i[j];
+			if(n.is_encompress) os<<i.loop;
+			for(op_t j=0;j<n.output_size;++j){
+				os<<i.data[j];
 			}
 		}
 		return os;
