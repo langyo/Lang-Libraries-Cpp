@@ -79,8 +79,8 @@ namespace ly{
 		compresser(bool will_encompress=true,op_t form=length,op_t to=length/2):is_encompress(will_encompress),input_size(form),output_size(to){}
 		// 构造函数；默认为压缩状态。
 	};
-	data_t &random_data(bool use_time_seed=false);
-	// 测试用代码，用于生成一串随机数据以测试压缩；调试状态下，请保持参数为false；如果想测试大批量测试压缩性能，请开true以生成不同的数据。
+	data_t random_data();
+	// 测试用代码，暂时废弃。
 }
 #include "algorithm.cpp"
 #endif
