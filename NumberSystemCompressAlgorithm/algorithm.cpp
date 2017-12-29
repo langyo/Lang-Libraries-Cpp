@@ -1,6 +1,6 @@
 #ifndef __LangCompressAlgorithm__cpp__
 #define __LangCompressAlgorithm__cpp__
-
+#include "algorithm.h"
 namespace ly{
 	/*
 		对于涉及多线程的函数的变量统一命名：
@@ -236,7 +236,8 @@ namespace ly{
 		return *this;
 	}
 	
-	std::istream &compresser::operator>>(std::istream &is,compresser &n){
+	template<> std::istream &std::istream::operator>>(compresser &n){
+		auto &is=*this;
 		// 输入流重载。
 		while(!is.eof()){
 			n.p.push_back();
@@ -255,7 +256,8 @@ namespace ly{
 		return is;
 	}
 	
-	std::ostream &compresser::operator<<(std::ostream &os,compresser &n)noexcept{
+	template<> std::ostream &std::ostream::operator<<(compresser &n)noexcept{
+		auto &os=*this;
 		// 输出流重载。
 		for(auto &i:n.p){
 			// 如果为压缩后数据，先写入循环次数头。
