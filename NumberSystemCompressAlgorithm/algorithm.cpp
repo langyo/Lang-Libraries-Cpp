@@ -266,16 +266,5 @@ namespace ly{
 		}
 		return os;
 	}
-	
-	data_t random_data(){
-		// 生成随机的测试数据，仅用于调试。
-		static std::default_random_engine e;
-		static std::uniform_int_distribution<byte> u(0,256);
-		static std::random_device rd;
-		e.seed(rd);
-		data_t ret;
-		for(auto &i:ret) i=u(e);
-		return ret;
-	}
 }
 #endif
