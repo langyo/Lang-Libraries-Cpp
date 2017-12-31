@@ -36,7 +36,7 @@ namespace ly{
 				for(i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
 					if(in.data[i]>=system){
 						in.data[i]-=system;
-						in.flag[j]|=1<<j;
+						in.flag[j]|=(1<<j);
 					}
 				}
 			}
@@ -77,11 +77,11 @@ namespace ly{
 				// 将此线程的累加结果加至总结果。
 				locker l(data_locker);
 				do{
-					t+=sum_all[i]+sum[i];
+					t+=(sum_all[i]+sum[i]);
 					sum_all[i]=static_cast<byte>(t);
 					t>>=byte_size;
 					++i;
-				}while(t!=0||i<j);
+				}while((t!=0)||(i<j));
 			}
 		};
 		// 分配线程。
@@ -96,12 +96,12 @@ namespace ly{
 		// size变量部分。
 		op_t i=in.size;
 		// 压缩后的数据末尾有多少零，就砍掉几个字节。
-		for(;i>=0&&sum_all[i]==0;--i);
-		in.size=i+flag_size;
+		for(;(i>=0)&&(sum_all[i]==0);--i);
+		in.size=(i+flag_size);
 		// 首先写入固定的flag_size。
 		for(op_t j=0;j<flag_size;++j) in.data[j]=in.flag[j];
 		// 然后将sum_all填入；别问我为什么不用std::copy。
-		for(op_t j=flag_size,k=0;k<i;++j,++k) in.data[k]=std::move(sum_all[j]);
+		for(op_t j=flag_size,k=0;k<i;++j,++k) in.data[k]=sum_all[j];
 		// 将末尾部分补零；如果实在想更快些可以不要这段，但不保证会不会出现数据错误。
 		for(op_t j=i+flag_size;j<length;++j) in.data[j]=0;
 	}
@@ -132,22 +132,22 @@ namespace ly{
 				i=s;
 				do{
 					t<<=byte_size;
-					t+=in.data[i]+sum[i];
+					t+=(in.data[i]+sum[i]);
 					sum[i]=static_cast<byte>(t/system);
 					t%=system;
 					--i;
-				}while(t!=0&&i>=flag_size);
+				}while((t!=0)&&(i>=flag_size));
 			}
 			// 将此线程的累加结果加至总结果。
 			t=0;
 			{
 				locker l(data_locker);
 				do{
-					t+=sum_all[i]+sum[i];
+					t+=(sum_all[i]+sum[i]);
 					sum_all[i]=static_cast<byte>(t);
 					t>>=byte_size;
 					++i;
-				}while(t<s||t!=0);
+				}while((i<s)||(t!=0));
 			}
 		};
 		// 分配线程。
@@ -182,7 +182,7 @@ namespace ly{
 		// loop变量部分。
 		--in.loop;
 		// size变量部分。
-		for(i=length-1;i>=0&&in.data[i]==0;--i);
+		for(i=length-1;(i>=0)&&(in.data[i]==0);--i);
 		in.size=i;
 	}
 	
