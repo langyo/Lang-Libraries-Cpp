@@ -26,13 +26,12 @@ namespace ly{
 		// 使得源输入数据符合压缩要求，能够进行压缩。
 		static void_func strainer=[&](){
 			op_t s,i,j;
-			for(;;){
+			for(;s<flag_size;){
 				{
 					// 获取任务号。
 					locker l(step_locker);
 					s=step++;
 				}
-				if(s>=flag_size) break;
 				// 对本线程处理范围内的数据进行检查，如果有超过system的字节，将此字节缩小至小于system并设置其对应标志位。
 				for(i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
 					if(in.data[i]>=system){
@@ -55,12 +54,11 @@ namespace ly{
 		static void_func translater=[&](){
 			data_t sum;
 			op_t s,t,i,j;
-			for(;;){
+			for(;s<length;){
 				{
 					locker l(step_locker);
 					s=step++;
 				}
-				if(s>=length) break;
 				// 如果乘数为零就不用算了，直接过。
 				if(in.data[s]==0) continue;
 				// 乘法+进位加法。
@@ -125,12 +123,11 @@ namespace ly{
 		static void_func translater=[&](){
 			data_t sum;
 			op_t s,t=0,i;
-			for(;;){
+			for(;s>=flag_size;){
 				{
 					locker l(step_locker);
 					s=step--;
 				}
-				if(s<flag_size) break;
 				// 这里的并行除法算法是根据每一数位的除数与余数关系而写的。
 				i=s;
 				do{
@@ -166,12 +163,11 @@ namespace ly{
 		step=0;
 		static void_func strainer=[&](){
 			op_t s,i,j;
-			for(;;){
+			for(;s<flag_size;){
 				{
 					locker l(step_locker);
 					s=step++;
 				}
-				if(s>=flag_size) break;
 				// 根据原本flag_size里记录的结果来还原数据。
 				for(i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
 					if((in.flag[s]&(1<<j))!=0) in.data[i]+=system;
@@ -197,12 +193,11 @@ namespace ly{
 		std::mutex step_locker;
 		static void_func encompresser=[&](){
 			op_t s;
-			for(;;){
+			for(;s<p.size();){
 				{
 					locker l(step_locker);
 					s=step++;
 				}
-				if(s>=p.size()) break;
 				do{
 					encompress(p[s]);
 				}while(p[s].size>output_size);
@@ -220,12 +215,11 @@ namespace ly{
 		std::mutex step_locker;
 		static void_func decompresser=[&](){
 			op_t s;
-			for(;;){
+			for(;s<p.size();){
 				{
 					locker l(step_locker);
 					s=step++;
 				}
-				if(s>=p.size()) break;
 				do{
 					decompress(p[s]);
 				}while(p[s].loop>0);
