@@ -25,7 +25,7 @@ namespace ly{
 		// ——第一部分：净化数据——
 		// 使得源输入数据符合压缩要求，能够进行压缩。
 		static void_func strainer=[&](){
-			op_t s,i,j;
+			op_t s=0,i,j;
 			for(;s<flag_size;){
 				{
 					// 获取任务号。
@@ -53,7 +53,7 @@ namespace ly{
 		step=0;
 		static void_func translater=[&](){
 			data_t sum;
-			op_t s,t,i,j;
+			op_t s=0,t,i,j=0;
 			for(;s<length;){
 				{
 					locker l(step_locker);
@@ -70,7 +70,7 @@ namespace ly{
 					t>>=byte_size;
 					++i;
 				}while(t!=0);
-				if(s>j) j=s;
+				if(i>j) j=i;
 			}
 			t=0;
 			{
@@ -81,7 +81,7 @@ namespace ly{
 					sum_all[i]=static_cast<byte>(t);
 					t>>=byte_size;
 					++i;
-				}while((t!=0)||(i<j));
+				}while((t!=0)||(i<=j));
 			}
 		};
 		// 分配线程。
