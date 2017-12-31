@@ -15,7 +15,7 @@
 namespace ly{
 	typedef unsigned char byte;
 	// 一个字节。
-	typedef long op_t;
+	typedef unsigned long op_t;
 	// 在算法中参与运算的整数类型；如果要移植到低配置、低要求的机器上，可以将此类型改改。
 	
 	constexpr auto length=256;
