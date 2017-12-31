@@ -174,7 +174,7 @@ namespace ly{
 				if(s>=flag_size) break;
 				// 根据原本flag_size里记录的结果来还原数据。
 				for(i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
-					if(in.flag[s]&(1<<j)!=0) in.data[i]+=system;
+					if((in.flag[s]&(1<<j))!=0) in.data[i]+=system;
 				}
 			}
 		};
