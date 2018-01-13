@@ -1,3 +1,6 @@
+#include <array>
+#include <utility>
+
 #ifndef __LangCompressAlgorithm__Lite__cpp__
 #define __LangCompressAlgorithm__Lite__cpp__
 
