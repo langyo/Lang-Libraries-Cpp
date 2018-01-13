@@ -27,6 +27,7 @@ namespace ly{
 		static void_func strainer=[&](){
 			op_t s=0,i,j;
 			for(;s<flag_size;){
+				assert(s<flag_size);
 				{
 					// 获取任务号。
 					locker l(step_locker);
@@ -34,6 +35,7 @@ namespace ly{
 				}
 				// 对本线程处理范围内的数据进行检查，如果有超过system的字节，将此字节缩小至小于system并设置其对应标志位。
 				for(i=byte_size*s,j=byte_size-1;j>=0;++i,--j){
+					assert(in.data[i]!=0);
 					if(in.data[i]>=system){
 						in.data[i]-=system;
 						in.flag[j]|=(1<<j);
