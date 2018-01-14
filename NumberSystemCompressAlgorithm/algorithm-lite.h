@@ -20,6 +20,7 @@ namespace ly{
 		
 		inline void print_hex(byte &in){
 			using std::cout;
+			using std::endl;
 			
 			long left=in>>4,right=in&0x0F;
 			switch(left){
@@ -89,8 +90,9 @@ namespace ly{
 					t>>byte_size;
 				}
 				assert(t>0);
-				std::cout<<endl<<endl<<""
-				for(auto &i:mulled)
+				std::cout<<std::endl<<"测试当前结果：";
+				for(auto &i:mulled) print_hex(i);
+				std::cout<<std::endl;
 				
 				// 将mulled与sum相加，存入sum。 
 				// t为累加数字，用于实现进位。
@@ -135,7 +137,7 @@ namespace ly{
 			for(auto k=n.rbegin();k!=n.rend();++k){
 				long t=0;
 				for(long j=length-1;j>0;t<<=byte_size,t+=n[j],n[j--]=static_cast<byte>(t/base),t%=base);
-				sum[k]=static_cast<byte>(t);
+				(*k)=static_cast<byte>(t);
 			}
 			for(long i=0,k=length-1;i<length;++i,--k) if((sum[0]&(1<<k))!=0) sum[i]+=base;
 		}
