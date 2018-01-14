@@ -19,6 +19,8 @@ namespace ly{
 		
 		
 		inline void print_hex(byte &in){
+			using std::cout;
+			
 			long left=in>>4,right=in&0x0F;
 			switch(left){
 				case 0:cout<<"0";break;
