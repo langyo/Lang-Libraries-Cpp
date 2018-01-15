@@ -15,13 +15,13 @@ namespace ly{
 		constexpr auto byte_size=8;
 		
 		typedef unsigned char byte;
-		typedef std::array<byte,length> data_t;
+		typedef std::array<byte,length> data_t; 
 		
+		using std::cout;
+		using std::endl;
 		
-		inline void print_hex(byte &in){
-			using std::cout;
-			using std::endl;
-			
+		// 调试用代码，正式版会删除。 
+		inline void print_hex(byte &in){ 
 			long left=in>>4,right=in&0x0F;
 			switch(left){
 				case 0:cout<<"0";break;
@@ -62,9 +62,14 @@ namespace ly{
 			cout<<" ";
 		}
 
+		// 调试用代码，正式版会删除。
+		inline void print_data(data_t &in){
+			for(auto &i:in) print_hex(i);
+			cout<<endl;
+		}
 		
 		void encompress_core(data_t &n){
-			data_t sum;
+			data_t sum={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 			byte flag;
 			
 			// *设置Flag位*
@@ -77,24 +82,20 @@ namespace ly{
 			
 			// *乘法计算*
 			// mulling为base n次方的临时存储变量。
-			data_t mulling={0x01};
+			data_t mulling={0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 			// k为被乘数下标。 
-			for(long k=0;k<length;++k){
-				// 计算mulling*n[k]的结果到mulled。
+			for(auto k=n.begin();k!=n.end();++k){
+				// mulled=mulling*n[k]
 				// t为累加数字，用于实现进位。
 				long t=0; 
 				data_t mulled;
 				for(auto i=mulling.begin(),j=mulled.begin();i!=mulling.end();++i,++j){
-					t+=(*i)*n[k];
+					t+=(*i)*(*k);
 					(*j)=static_cast<byte>(t);
-					t>>byte_size;
+					t>>=byte_size;
 				}
-				assert(t>0);
-				std::cout<<std::endl<<"测试当前结果：";
-				for(auto &i:mulled) print_hex(i);
-				std::cout<<std::endl;
 				
-				// 将mulled与sum相加，存入sum。 
+				// sum+=mulled
 				// t为累加数字，用于实现进位。
 				t=0;
 				for(auto i=mulled.begin(),j=sum.begin();i!=mulled.end();++i,++j){
@@ -102,17 +103,15 @@ namespace ly{
 					(*j)=static_cast<byte>(t);
 					t>>=byte_size;
 				} 
-				assert(t>0);
 				
-				// 计算mulling*base，并存入mulling。
+				// mulling*=base
 				// t为累加数字，用于实现进位。
 				t=0;
 				for(auto &i:mulling){
 					t+=i*base;
 					i=static_cast<byte>(t);
-					t>>byte_size;
+					t>>=byte_size;
 				} 
-				assert(t>0);
 			}
 			
 			// *将flag写入sum* 
@@ -122,7 +121,7 @@ namespace ly{
 			sum.front()=flag;
 			
 			// 写回去。 
-			n=std::move(sum);
+			n=sum;
 		}
 		
 		void decompress_core(data_t &n){
