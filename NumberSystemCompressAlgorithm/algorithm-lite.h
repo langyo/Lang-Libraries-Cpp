@@ -69,8 +69,7 @@ namespace ly{
 			cout<<endl;
 		}
 		
-		void encompress_core(data_t &n){
-			cerr<<"72行成功执行"<<endl; 
+		data_t encompress_core(data_t &n){
 			data_t sum={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 			byte flag;
 			
@@ -96,7 +95,6 @@ namespace ly{
 					(*j)=static_cast<byte>(t);
 					t>>=byte_size;
 				}
-				cerr<<"97行成功执行"<<endl; 
 				
 				// sum+=mulled
 				// t为累加数字，用于实现进位。
@@ -106,7 +104,6 @@ namespace ly{
 					(*j)=static_cast<byte>(t);
 					t>>=byte_size;
 				} 
-				cerr<<"107行成功执行"<<endl; 
 				
 				// mulling*=base
 				// t为累加数字，用于实现进位。
@@ -115,22 +112,20 @@ namespace ly{
 					t+=i*base;
 					i=static_cast<byte>(t);
 					t>>=byte_size;
-				} 
-				cerr<<"117行成功执行"<<endl; 
+				}  
 			}
 			
-			cerr<<"120行成功执行"<<endl; 
 			// *将flag写入sum* 
 			// 将sum的前7位向前移动，给flag腾出位置（大雾）。
 			for(auto i=sum.rbegin(),j=++sum.rbegin();j!=sum.rend();(*i)=(*j));
 			// 然后当然是把flag写进sum开头啦。
 			sum.front()=flag;
 			
-			// 写回去。 
-			n=sum;
+			// 返回处理后的数据。 
+			return sum;
 		}
 		
-		void decompress_core(data_t &n){
+		data_t decompress_core(data_t &n){
 			data_t sum;
 			
 			// *备份flag位*
@@ -138,13 +133,27 @@ namespace ly{
 			byte &flag=n.front();
 			 
 			// *除法运算*
-			// k为被除数
+			// k为被除数。 
 			for(auto k=n.rbegin();k!=n.rend();++k){
 				long t=0;
-				for(long j=length-1;j>0;t<<=byte_size,t+=n[j],n[j--]=static_cast<byte>(t/base),t%=base);
+				for(auto j=n.rbegin();j!=n.rend();--j){
+					t<<=byte_size;
+					t+=(*j);
+					(*j)=static_cast<byte>(t/base);
+					t%=base;
+				}
 				(*k)=static_cast<byte>(t);
 			}
-			for(long i=0,k=length-1;i<length;++i,--k) if((sum[0]&(1<<k))!=0) sum[i]+=base;
+			
+			// *设置Flag位* 
+			for(long i=0,k=length-1;i<length;++i,--k){
+				if((sum.front()&(1<<k))!=0){
+					sum[i]+=base;
+				}
+			}
+			
+			// 返回处理后的数据。
+			return sum; 
 		}
 	}
 }
