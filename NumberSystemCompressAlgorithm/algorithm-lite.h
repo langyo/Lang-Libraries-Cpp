@@ -18,6 +18,7 @@ namespace ly{
 		typedef std::array<byte,length> data_t; 
 		
 		using std::cout;
+		using std::cerr;
 		using std::endl;
 		
 		// 调试用代码，正式版会删除。 
@@ -69,6 +70,7 @@ namespace ly{
 		}
 		
 		void encompress_core(data_t &n){
+			cerr<<"72行成功执行"<<endl; 
 			data_t sum={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 			byte flag;
 			
@@ -94,6 +96,7 @@ namespace ly{
 					(*j)=static_cast<byte>(t);
 					t>>=byte_size;
 				}
+				cerr<<"97行成功执行"<<endl; 
 				
 				// sum+=mulled
 				// t为累加数字，用于实现进位。
@@ -103,6 +106,7 @@ namespace ly{
 					(*j)=static_cast<byte>(t);
 					t>>=byte_size;
 				} 
+				cerr<<"107行成功执行"<<endl; 
 				
 				// mulling*=base
 				// t为累加数字，用于实现进位。
@@ -112,8 +116,10 @@ namespace ly{
 					i=static_cast<byte>(t);
 					t>>=byte_size;
 				} 
+				cerr<<"117行成功执行"<<endl; 
 			}
 			
+			cerr<<"120行成功执行"<<endl; 
 			// *将flag写入sum* 
 			// 将sum的前7位向前移动，给flag腾出位置（大雾）。
 			for(auto i=sum.rbegin(),j=++sum.rbegin();j!=sum.rend();(*i)=(*j));
