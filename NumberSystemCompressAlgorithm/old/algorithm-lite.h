@@ -13,14 +13,14 @@ namespace ly{
 		constexpr auto length=8;
 		constexpr auto base=0x80;
 		constexpr auto byte_size=8;
-		
+
 		typedef unsigned char byte;
 		typedef std::array<byte,length> data_t; 
-		
+
 		using std::cout;
 		using std::cerr;
 		using std::endl;
-		
+
 		// 调试用代码，正式版会删除。 
 		inline void print_hex(byte &in){ 
 			long left=in>>4,right=in&0x0F;
@@ -68,11 +68,11 @@ namespace ly{
 			for(auto &i:in) print_hex(i);
 			cout<<endl;
 		}
-		
+
 		data_t encompress_core(data_t &n){
 			data_t sum={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 			byte flag;
-			
+
 			// *设置Flag位*
 			for(long i=0,k=length-1;i<length;++i,--k){
 				if(n[i]>=base){
@@ -80,7 +80,7 @@ namespace ly{
 					flag|=(1<<k);
 				}
 			}
-			
+
 			// *乘法计算*
 			// mulling为base n次方的临时存储变量。
 			data_t mulling={0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -95,7 +95,7 @@ namespace ly{
 					(*j)=static_cast<byte>(t);
 					t>>=byte_size;
 				}
-				
+
 				// sum+=mulled
 				// t为累加数字，用于实现进位。
 				t=0;
@@ -104,7 +104,7 @@ namespace ly{
 					(*j)=static_cast<byte>(t);
 					t>>=byte_size;
 				} 
-				
+
 				// mulling*=base
 				// t为累加数字，用于实现进位。
 				t=0;
@@ -114,24 +114,24 @@ namespace ly{
 					t>>=byte_size;
 				}  
 			}
-			
+
 			// *将flag写入sum* 
 			// 将sum的前7位向前移动，给flag腾出位置（大雾）。
 			for(auto i=sum.rbegin(),j=++sum.rbegin();j!=sum.rend();(*i)=(*j));
 			// 然后当然是把flag写进sum开头啦。
 			sum.front()=flag;
-			
+
 			// 返回处理后的数据。 
 			return sum;
 		}
-		
+
 		data_t decompress_core(data_t &n){
 			data_t sum;
-			
+
 			// *备份flag位*
 			// （其实这也不是备份，而是创建一个引用……） 
 			byte &flag=n.front();
-			 
+
 			// *除法运算*
 			// k为被除数。 
 			for(auto k=n.rbegin();k!=n.rend();++k){
@@ -144,14 +144,14 @@ namespace ly{
 				}
 				(*k)=static_cast<byte>(t);
 			}
-			
+
 			// *设置Flag位* 
 			for(long i=0,k=length-1;i<length;++i,--k){
 				if((sum.front()&(1<<k))!=0){
 					sum[i]+=base;
 				}
 			}
-			
+
 			// 返回处理后的数据。
 			return sum; 
 		}
