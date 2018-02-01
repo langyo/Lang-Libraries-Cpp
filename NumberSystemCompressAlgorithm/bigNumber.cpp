@@ -1,10 +1,13 @@
+#include "bigNumber.h"
+
 #ifndef __ly__bigNumber__cpp__
 #define __ly__bigNumber__cpp__
 
 namespace ly{
 	namespace bigNumber{
 		bigIntUnsigned &bigIntUnsigned::operator+=(const bigIntUnsigned &n){
-			auto &lhs=this->data,&rhs=n.data;
+			auto &lhs=this->data;
+			auto &rhs=n.data;
 			
 			lhs.resize(max(lhs.size(),rhs.size())+1);
 			
@@ -26,8 +29,9 @@ namespace ly{
 		}
 		
 		bigIntUnsigned &bigIntUnsigned::operator-=(const bigIntUnsigned &n){
-			if((*this)<n) throw invalid_error("大数减法检查时错误:无符号下被减数比减数小。");
-			auto &lhs=this->data,&rhs=n.data;
+			if((*this)<n) throw invalid_argument("大数减法检查时错误:无符号下被减数比减数小。");
+			auto &lhs=this->data;
+			auto &rhs=n.data;
 			
 			long t=0;
 			auto i=lhs.begin();
@@ -44,18 +48,18 @@ namespace ly{
 			return *this;
 		}
 		
-		bigIntUnsigned &bigIntUnsigned::operator*=(const.bigIntUnsigned &n){
+		bigIntUnsigned &bigIntUnsigned::operator*=(const bigIntUnsigned &n){
 			this->data=((*this)*n).data;
 			return *this;
 		}
 		
 		bigIntUnsigned &bigIntUnsigned::operator/=(const bigIntUnsigned &n){
-			this->data=this->div(n).quotient;
+			this->data=div(*this,n).quotient.data;
 			return *this;
 		}
 		
 		bigIntUnsigned &bigIntUnsigned::operator%=(const bigIntUnsigned &n){
-			this->data=this->div(n).surplus;
+			this->data=div(*this,n).surplus.data;
 			return *this;
 		}
 		
@@ -90,15 +94,15 @@ namespace ly{
 		}
 		
 		bigIntUnsigned operator/(bigIntUnsigned l,const bigIntUnsigned &r){
-			return l.div(r).quotient;
+			return div(l,r).quotient;
 		}
 		
 		bigIntUnsigned operator%(bigIntUnsigned l,const bigIntUnsigned &r){
-			return l.div(r).surplus;
+			return div(l,r).surplus;
 		}
 		
 		divResultUnsigned div(bigIntUnsigned l,const bigIntUnsigned &r,cacheType cache=nullptr){
-			if(r.empty()) throw invalid_error("大数除法检查时错误:除数为零。");
+			if(r.empty()) throw invalid_argument("大数除法检查时错误:除数为零。");
 			if(l.empty()) return l;
 			auto &lhs=this->data,&rhs=r.data;
 			
