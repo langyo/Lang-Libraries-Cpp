@@ -40,12 +40,12 @@ namespace ly{
 			
 			friend divResultUnsigned div(bigIntUnsigned,const bigIntUnsigned &);
 			
-			bool operator<(bigIntUnsigned &);
-			bool operator>(bigIntUnsigned &);
-			bool operator==(bigIntUnsigned &);
-			bool operator<=(bigIntUnsigned &);
-			bool operator>=(bigIntUnsigned &);
-			bool operator!=(bigIntUnsigned &);
+			bool operator<(const bigIntUnsigned &);
+			bool operator>(const bigIntUnsigned &);
+			bool operator==(const bigIntUnsigned &);
+			bool operator<=(const bigIntUnsigned &);
+			bool operator>=(const bigIntUnsigned &);
+			bool operator!=(const bigIntUnsigned &);
 			
 			bigIntUnsigned &operator~();
 			bigIntUnsigned &operator|=(const bigIntUnsigned &);
