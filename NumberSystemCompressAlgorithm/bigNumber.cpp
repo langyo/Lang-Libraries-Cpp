@@ -104,10 +104,11 @@ namespace ly{
 		divResultUnsigned div(bigIntUnsigned l,const bigIntUnsigned &r,cacheType cache=nullptr){
 			if(r.empty()) throw invalid_argument("大数除法检查时错误:除数为零。");
 			if(l.empty()){
-				divResultUnsigned ret(l.begin(),l.end());
+				divResultUnsigned ret(l.data.begin(),l.data.end());
 				return ret;
 			};
-			auto &lhs=this->data,&rhs=r.data;
+			auto &lhs=l.data;
+			auto &rhs=r.data;
 			
 			vector<byte> sum;
 			
@@ -116,17 +117,17 @@ namespace ly{
 				bigIntUnsigned k(beginPos,i);
 				while(left!=right){
 					long middle=(left+right)/2;
-					if(cache->at(middle).data.empty()) cache->at(middle)l.data=(r*static_cast<bigIntUnsigned>(middle)).data;
+					if(cache->at(middle).data.empty()) cache->at(middle).data=(r*static_cast<bigIntUnsigned>(middle)).data;
 					if(k<cache->at(middle)) right=middle;
 					else left=middle;
 				}
 				k-=cache->at(left);
 				copy(k.data.rbegin(),k.data.rend(),beginPos);
 				for(;(*beginPos)==0;++beginPos);
-				sum.push_back(static_cast<byte>(left);
+				sum.push_back(static_cast<byte>(left));
 			}
 			
-			this->deleteUselessBytes();
+			l.deleteUselessBytes();
 			divResultUnsigned ret(sum.rbegin(),sum.rend(),lhs.begin(),lhs.end(),cache);
 			
 			return ret;
