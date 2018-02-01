@@ -36,7 +36,7 @@ namespace ly{
 			friend bigIntUnsigned operator%(const bigIntUnsigned &,const bigIntUnsigned &);
 			
 			bigIntUnsigned &deleteUselessBytes();
-			inline bool empty(){	return this->data.empty();	}
+			inline bool empty() const{	return this->data.empty();	}
 			
 			friend divResultUnsigned div(bigIntUnsigned,const bigIntUnsigned &);
 			
