@@ -13,17 +13,13 @@ namespace ly{
 	namespace bigNumber{
 		using namespace std;
 		
-		typedef unsigned char byte;
-		typedef shared_ptr<array<bigIntUnsigned,max_byte>> cacheType;
+		struct bigIntUnsigned;
+		struct divResultUnsigned;
+		
 		constexpr auto byte_size=8,max_byte=256;
 		
-		struct divResultUnsigned{
-			bigIntUnsigned quotient;
-			bigIntUnsigned surplus;
-			cacheType divisionCache;
-			
-			template<typename I,typename I2>divResultUnsigned(I beg,I end,I2 beg2,I2 end2,cacheType cache):quotient(beg,end),surplus(beg2,end2),divisionCache(cache){	}
-		};
+		typedef unsigned char byte;
+		typedef shared_ptr<array<bigIntUnsigned,max_byte>> cacheType;
 		
 		struct bigIntUnsigned{
 			vector<byte> data;
@@ -41,7 +37,7 @@ namespace ly{
 			friend bigIntUnsigned operator%(const bigIntUnsigned &,const bigIntUnsigned &);
 			
 			bigIntUnsigned &deleteUselessBytes();
-			inline bool empty(){	return this->data.empty());	}
+			inline bool empty(){	return this->data.empty();	}
 			
 			friend divResultUnsigned div(bigIntUnsigned,const bigIntUnsigned &);
 			
@@ -78,6 +74,14 @@ namespace ly{
 			bigIntUnsigned &operator=(unsigned long long);
 			
 			~bigIntUnsigned()=default;
+		};
+		
+		struct divResultUnsigned{
+			bigIntUnsigned quotient;
+			bigIntUnsigned surplus;
+			cacheType divisionCache;
+			
+			template<typename I,typename I2>divResultUnsigned(I beg,I end,I2 beg2,I2 end2,cacheType cache):quotient(beg,end),surplus(beg2,end2),divisionCache(cache){	}
 		};
 		
 		struct bigInt:public bigIntUnsigned{
