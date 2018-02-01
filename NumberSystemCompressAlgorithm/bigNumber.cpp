@@ -138,7 +138,7 @@ namespace ly{
 			return *this;
 		}
 		
-		bool bigIntUnsigned::operator<(bigIntUnsigned &n){
+		bool bigIntUnsigned::operator<(const bigIntUnsigned &n){
 			this->deleteUselessBytes(),n.deleteUselessBytes();
 			auto &lhs=this->data,&rhs=n.data;
 			if(lhs.size()<rhs.size()) return true;
