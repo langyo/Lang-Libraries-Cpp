@@ -103,7 +103,10 @@ namespace ly{
 		
 		divResultUnsigned div(bigIntUnsigned l,const bigIntUnsigned &r,cacheType cache=nullptr){
 			if(r.empty()) throw invalid_argument("大数除法检查时错误:除数为零。");
-			if(l.empty()) return l;
+			if(l.empty()){
+				divResultUnsigned ret(l.begin(),l.end());
+				return ret;
+			};
 			auto &lhs=this->data,&rhs=r.data;
 			
 			vector<byte> sum;
