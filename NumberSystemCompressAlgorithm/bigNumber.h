@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <utility>
 #include <stdexcept>
-#include <iterator>
 
 #ifndef __ly__bigNumber__h__
 #define __ly__bigNumber__h__
