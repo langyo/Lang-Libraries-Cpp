@@ -80,6 +80,8 @@ namespace ly{
 			bigIntUnsigned surplus;
 			cacheType divisionCache;
 			
+			template<typename I>divResultUnsigned(I beg,I end):quotient(beg,end){	}
+			template<typename I,typename I2>divResultUnsigned(I beg,I end,I2 beg2,I2 end2):quotient(beg,end),surplus(beg2,end2){	}
 			template<typename I,typename I2>divResultUnsigned(I beg,I end,I2 beg2,I2 end2,cacheType cache):quotient(beg,end),surplus(beg2,end2),divisionCache(cache){	}
 		};
 		
