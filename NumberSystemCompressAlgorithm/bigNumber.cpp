@@ -1,5 +1,3 @@
-#include "bigNumber.h"
-
 #ifndef __ly__bigNumber__cpp__
 #define __ly__bigNumber__cpp__
 
