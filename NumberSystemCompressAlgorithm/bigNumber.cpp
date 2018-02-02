@@ -257,15 +257,15 @@ namespace ly{
 			return *this;
 		}
 		
-		explicit bigIntUnsigned::operator unsigned long long(){
-			constexpr size=sizeof(unsigned long long);
+		bigIntUnsigned::operator unsigned long long(){
+			constexpr auto size=sizeof(unsigned long long);
 			unsigned long long ret=0;
 			auto i=this->data.cbegin();
-			for(long t=0;t<data && i!=this->data.cend();ret|=(*i)<<(t*byte_size));
+			for(long t=0;t<*i && i!=this->data.cend();ret|=(*i)<<(t*byte_size));
 			return ret;
 		}
 		
-		explicit bigIntUnsigned::operator bool(){
+		bigIntUnsigned::operator bool(){
 			this->deleteUselessBytes();
 			if(this->data.empty()) return true;
 			return false;
