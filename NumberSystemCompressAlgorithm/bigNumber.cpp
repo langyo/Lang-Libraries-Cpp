@@ -139,23 +139,23 @@ namespace ly{
 		}
 		
 		bool bigIntUnsigned::operator<(const bigIntUnsigned &n){
-			this->deleteUselessBytes(),n.deleteUselessBytes();
-			auto &lhs=this->data,&rhs=n.data;
+			// this->deleteUselessBytes(),n.deleteUselessBytes();
+			auto &lhs=this->data;
+			auto &rhs=n.data;
 			if(lhs.size()<rhs.size()) return true;
 			if(lhs.size()>rhs.size()) return false;
-			for(auto i=lhs.rbegin(),j=rhs.rbegin();i!=lhs.rend();++i,++j) if((*i)<(*j)) return true;
-			return false;
+	
+			return lexicographical_compare(lhs.rbegin(), lhs.rend(), rhs.crbegin(), rhs.crend());
 		}
 		
 		inline bool bigIntUnsigned::operator>(const bigIntUnsigned &n){
-			return !(*this)<=n;
+			return !((*this)<=n);
 		}
 		
-		bool bigIntUnsigned::operator==(const bigIntUnsigned &n){
-			auto &lhs=this->data,&rhs=n.data;
-			if(lhs.size()!=rhs.size()) return false;
-			for(auto i=lhs.begin(),j=rhs.begin();i!=lhs.end();++i,++j) if((*i)!=(*j)) return false;
-			return true;
+		inline bool bigIntUnsigned::operator==(const bigIntUnsigned &n){
+			auto &lhs=this->data;
+			auto &rhs=n.data;
+			return equal(lhs.begin(),lhs.end(),rhs.cbegin(),rhs.cend());
 		}
 		
 		inline bool bigIntUnsigned::operator<=(const bigIntUnsigned &n){
@@ -167,35 +167,38 @@ namespace ly{
 		}
 		
 		inline bool bigIntUnsigned::operator!=(const bigIntUnsigned &n){
-			return !(*this)==n;
+			return !((*this)==n);
 		}
 		
-		bigIntUnsigned bigIntUnsigned::operator~(){
-			for(auto *i:this->data) i=~i;
+		bigIntUnsigned &bigIntUnsigned::operator~(){
+			for(auto &i:this->data) i=~i;
 			return *this;
 		}
 		
 		bigIntUnsigned &bigIntUnsigned::operator|=(const bigIntUnsigned &n){
-			auto &lhs=this->data,&rhs=n.data;
+			auto &lhs=this->data;
+			auto &rhs=n.data;
 			auto j=rhs.cbegin();
 			for(auto i=lhs.begin();i!=lhs.end()&&j!=rhs.cend();++i,++j) (*i)|=(*j);
-			for(;j!=rhs.end();lhs.push_back((*j)++));
+			while (j!=rhs.end()) lhs.push_back(*j),++j;
 			return *this;
 		}
 		
 		bigIntUnsigned &bigIntUnsigned::operator^=(const bigIntUnsigned &n){
-			auto &lhs=this->data,&rhs=n.data;
+			auto &lhs=this->data;
+			auto &rhs=n.data;
 			auto j=rhs.cbegin();
 			for(auto i=lhs.begin();i!=lhs.end()&&j!=rhs.cend();++i,++j) (*i)^=(*j);
-			for(;j!=rhs.end();lhs.push_back((*j)++));
+			while (j!=rhs.end()) lhs.push_back(*j),++j;
 			return *this;
 		}
 		
 		bigIntUnsigned &bigIntUnsigned::operator&=(const bigIntUnsigned &n){
-			auto &lhs=this->data,&rhs=n.data;
+			auto &lhs=this->data;
+			auto &rhs=n.data;
 			auto j=rhs.cbegin();
 			for(auto i=lhs.begin();i!=lhs.end()&&j!=rhs.cend();++i,++j) (*i)&=(*j);
-			for(;j!=rhs.end();lhs.push_back((*j)++));
+			while (j!=rhs.end()) lhs.push_back(*j);
 			return *this;
 		}
 		
@@ -269,12 +272,11 @@ namespace ly{
 		}
 		
 		bigIntUnsigned::bigIntUnsigned(unsigned long long n){
-			constexpr size=sizeof(unsigned long long);
 			while(n!=0) this->data.push_back(static_cast<byte>(n)),n>>=byte_size;
 		}
 		
 		bigIntUnsigned &bigIntUnsigned::operator=(unsigned long long n){
-			this->data=static_cast<bigIntUnsigned>(n).data;
+			this->data=bigIntUnsigned(n).data;
 			return *this;
 		}
 	}
