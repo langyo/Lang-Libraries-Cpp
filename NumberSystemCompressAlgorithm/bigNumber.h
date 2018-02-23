@@ -38,7 +38,7 @@ namespace ly{
 			bigIntUnsigned &deleteUselessBytes();
 			inline bool empty() const{	return this->data.empty();	}
 			
-			friend divResultUnsigned div(bigIntUnsigned,const bigIntUnsigned &);
+			friend divResultUnsigned div(bigIntUnsigned,const bigIntUnsigned &,cacheType cache=nullptr);
 			
 			bool operator<(const bigIntUnsigned &);
 			bool operator>(const bigIntUnsigned &);
@@ -90,7 +90,9 @@ namespace ly{
 		};
 	}
 	
-	using bigNumber::bigIntUnsigned;
+	using namespace bigNumber;
 }
 
 #endif
+
+#include "bigNumber.cpp"
