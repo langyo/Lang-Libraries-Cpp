@@ -22,38 +22,38 @@ namespace ly{
  			union{
  				T myself;
  				union_element<id+1,Args...> others;
-			}e;
+			};
 			
 			size_t &disc;
 			const function<void()> &destroy;
 			
 			void do_destroy(){
-			    if(id==disc) e.myself;
-			    else e.others.do_distroy();
+			    if(id==disc) myself;
+			    else others.do_distroy();
 			}
 			
 			template <T> bool is(){
 			    if(id==disc) return true;
 			    return false;
 			}
-			template <typename N> bool is(){    return e.others.is<N>();    }
+			template <typename N> bool is(){    return others.is<N>();    }
 			
-			explicit operator T&(){ return e.myself;    }
-			operator decltype(e.others) &(){    return e.others;    }
+			explicit operator T&(){ return myself;    }
+			operator decltype(others) &(){    return others;    }
 			
-			union_element(size_t &d,const function<void()> &f):disc(d),destroy(f),e.others(d,f){}
-			union_element(size_t &d,const function<void()> &f,const T &n):disc(d),destroy(f),e.myself(n),e.others(d,f){}
-			template <typename N> union_element(size_t &d,const function<void()> &f,const N &n):disc(d),destroy(f),e.others(d,f,n){}
+			union_element(size_t &d,const function<void()> &f):disc(d),destroy(f),others(d,f){}
+			union_element(size_t &d,const function<void()> &f,const T &n):disc(d),destroy(f),myself(n),others(d,f){}
+			template <typename N> union_element(size_t &d,const function<void()> &f,const N &n):disc(d),destroy(f),others(d,f,n){}
 			union_element(const union_element &) = delete;
 			
 			T &operator=(const T &n){
 				if(id!=disc) destroy();
-				e.myself = n;
+				myself = n;
 				disc = id;
-				return e.myself;
+				return myself;
 			}
 			template <typename N> N &operator=(const N &n){
-			    return e.others = n;
+			    return others = n;
 			}
 			union_element &operator=(const union_element &) = delete;
 			
@@ -62,15 +62,13 @@ namespace ly{
 		
 		template <size_t id,typename T>
  		struct union_element<id,T>{
- 			union{
- 				T myself;
-			}e;
+ 			T myself;
 			
 			size_t &disc;
 			const function<void()> &destroy;
 			
 			void do_destroy(){
-			    if(id==disc) e.myself;
+			    if(id==disc) myself;
 			    else throw logic_error("Can't destroy this union pack");
 			}
 			
@@ -79,17 +77,17 @@ namespace ly{
 			    return false;
 			}
 			
-			explicit operator T&(){ return e.myself;    }
+			explicit operator T&(){ return myself;    }
 			
 			union_element(size_t &d,const function<void()> &f):disc(d),destroy(f){}
-			union_element(size_t &d,const function<void()> &f,const T &n):disc(d),destroy(f),e.myself(n){}
+			union_element(size_t &d,const function<void()> &f,const T &n):disc(d),destroy(f),myself(n){}
 			union_element(const union_element &) = delete;
 			
 			T &operator=(const T &n){
 				if(id!=disc) destroy();
-				e.myself = n;
+				myself = n;
 				disc = id;
-				return e.myself;
+				return myself;
 			}
 			union_element &operator=(const union_element &) = delete;
 			
@@ -100,7 +98,7 @@ namespace ly{
  		class union_pack{
  			size_t disc;
  			union_element<0,T,Args...> elements;
- 			function<void()> destroy = [&](){	elements.do_destroy();	}
+ 			function<void()> destroy = [&](){	elements.do_destroy();	};
 		public:
 			template <typename N> bool is(){	return elements.is<N>();	}
 			template <typename N> bool is(const N &){	return this->is<N>();	}
