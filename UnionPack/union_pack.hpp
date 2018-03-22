@@ -28,7 +28,7 @@ namespace ly{
 			const function<void()> &destroy;
 			
 			void do_destroy(){
-			    if(id==disc) e.myself；
+			    if(id==disc) e.myself;
 			    else e.others.do_distroy();
 			}
 			
@@ -70,7 +70,7 @@ namespace ly{
 			const function<void()> &destroy;
 			
 			void do_destroy(){
-			    if(id==disc) e.myself；
+			    if(id==disc) e.myself;
 			    else throw logic_error("Can't destroy this union pack");
 			}
 			
